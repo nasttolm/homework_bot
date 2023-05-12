@@ -1,0 +1,2 @@
+class HomeworkStatusesException(Exception):
+    pass
