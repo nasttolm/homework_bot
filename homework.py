@@ -6,7 +6,8 @@ import requests
 import os
 from dotenv import load_dotenv
 import logging
-from exceptions import HomeworkStatusesException
+from exceptions import (HomeworkStatusesException, SendMessageException,
+                        ApiAnswerException)
 
 load_dotenv()
 
@@ -32,19 +33,21 @@ HOMEWORK_VERDICTS = {
 
 def check_tokens():
     """Проверяет доступность переменных окружения."""
-    return [PRACTICUM_TOKEN, TELEGRAM_TOKEN, TELEGRAM_CHAT_ID]
+    return all((PRACTICUM_TOKEN, TELEGRAM_TOKEN, TELEGRAM_CHAT_ID))
 
 
 def send_message(bot, message):
     """Отправляет сообщение в Telegram чат."""
     try:
+        logging.debug('Начало отправки сообщения')
         bot.send_message(
             chat_id=TELEGRAM_CHAT_ID,
             text=message
         )
-        logging.debug(f'Удачная отправка сообщения: {Exception}')
-    except Exception as error:
-        logging.error(f'Сбой при отправке сообщения: {error}')
+    except Exception:
+        raise SendMessageException('Сбой при отправке сообщения: {Exception}')
+    else:
+        logging.debug('Удачная отправка сообщения')
 
 
 def get_api_answer(timestamp):
@@ -55,14 +58,13 @@ def get_api_answer(timestamp):
             headers=HEADERS,
             params={'from_date': timestamp}
         )
-    except Exception as error:
-        logging.error(f'Ошибка при запросе к основному API: {error}')
+    except Exception:
+        raise ApiAnswerException('Сбой при отправке сообщения: {Exception}')
     else:
         if homework_statuses.status_code == HTTPStatus.OK:
             return homework_statuses.json()
         message = 'Сервис недоступен.'
         raise Exception(message)
-    return homework_statuses.json()
 
 
 def check_response(response):
@@ -92,7 +94,7 @@ def parse_status(homework):
 def main():
     """Основная логика работы бота."""
     tokens = check_tokens()
-    if None in tokens:
+    if not tokens:
         logging.critical(f'Ошибка доступа к переменным окружения: {Exception}')
         sys.exit('Ошибка переменных окружения. Работа программы прервана')
 
@@ -109,6 +111,10 @@ def main():
                 status_homework = homework_list[0]
                 message = parse_status(status_homework)
                 send_message(bot, message)
+        except ApiAnswerException:
+            logging.error(f'Ошибка при запросе к основному API: {Exception}')
+        except SendMessageException:
+            logging.error(f'Сбой при отправке сообщения: {Exception}')
         except Exception as error:
             message = f'Сбой в работе программы: {error}'
             send_message(bot, message)
