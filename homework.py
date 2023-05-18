@@ -45,7 +45,7 @@ def send_message(bot, message):
             text=message
         )
     except Exception:
-        raise SendMessageException('Сбой при отправке сообщения: {Exception}')
+        raise SendMessageException(f'Сбой при отправке сообщения: {Exception}')
     else:
         logging.debug('Удачная отправка сообщения')
 

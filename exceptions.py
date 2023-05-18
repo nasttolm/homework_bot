@@ -6,4 +6,3 @@ class  SendMessageException(Exception):
 
 class  ApiAnswerException(Exception):
     pass
-
