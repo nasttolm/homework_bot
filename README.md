@@ -1,7 +1,7 @@
 # Telegram Bot
 Yandex educational project. Python Developer course (backend).
 ### Description
-Bot for Telegram. Polls the Yandex Practicum API and gets the status of homework. It transmitte status data and possible errors to the Telegram chat.
+A bot for Telegram, which accesses the Yandex Practicum API and gets the status of homework. Then it transmits/sends status data and possible errors to the Telegram chat.
 A project to study logging and error handling. Logging is carried out using the logging module.
 ### Running a project in dev mode
 - Install and activate the virtual environment
